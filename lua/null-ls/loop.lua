@@ -96,8 +96,8 @@ M.spawn = function(cmd, args, opts)
     local stderr = uv.new_pipe(false)
     local stdio = { stdin, stdout, stderr }
 
-    local handle
-    local on_close = function(code)
+    local handle, on_close
+    on_close = function(code)
         stdout:read_stop()
         stderr:read_stop()
 
@@ -120,6 +120,8 @@ M.spawn = function(cmd, args, opts)
         end
 
         done(exit_ok, code == TIMEOUT_EXIT_CODE)
+        -- ensure additional on_close calls do nothing
+        on_close = function() end
     end
 
     local parsed_env = nil
